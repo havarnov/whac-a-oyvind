@@ -1,0 +1,9 @@
+[package]
+name = "whac-a-oyvind"
+version = "0.1.0"
+authors = ["Håvar Nøvik <havar.novik@esmartsystems.com>"]
+
+[dependencies]
+quicksilver = "*"
+futures = "0.1"
+rand = "=0.5.0"
