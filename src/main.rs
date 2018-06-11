@@ -19,7 +19,7 @@ struct Mole {
     ttl: usize,
     image: ImageViewer,
 }
-    // SampleText::Loading(Font::load("examples/assets/font.ttf")) }
+// SampleText::Loading(Font::load("examples/assets/font.ttf")) }
 
 impl Mole {
     fn new(x: f32, y: f32, ttl: usize) -> Mole {
@@ -60,58 +60,58 @@ enum ImageViewer {
 }
 
 impl State for Whac {
-   fn new() -> Whac { 
-       Whac {
-           score_text_font: None,
-           score_text_loader: ScoreTextLoader::Loading(Font::load("assets/font.ttf")),
-           score: 0,
-           step: 0,
-           moles: [Some(Mole::new(200f32, 200f32, 90)), None, None, None, None],
-           ttl: 90,
-           miss: 0,
-           state: GameState::Started,
-           delay: 0,
-          }
-   }
+    fn new() -> Whac {
+        Whac {
+            score_text_font: None,
+            score_text_loader: ScoreTextLoader::Loading(Font::load("assets/font.ttf")),
+            score: 0,
+            step: 0,
+            moles: [Some(Mole::new(200f32, 200f32, 90)), None, None, None, None],
+            ttl: 90,
+            miss: 0,
+            state: GameState::Started,
+            delay: 0,
+        }
+    }
 
-   fn update(&mut self, _window: &mut Window) {
+    fn update(&mut self, _window: &mut Window) {
 
-       if self.miss >= 10 {
-           self.state = GameState::Lost(self.score);
-       }
+        if self.miss >= 10 {
+            self.state = GameState::Lost(self.score);
+        }
 
         for mole in self.moles.iter_mut() {
             if let Some(ref mut mole) = mole {
-       // Check to see the progress of the loading image
-       let result = match mole.image {
-           ImageViewer::Loading(ref mut loader) => loader.poll().unwrap(),
-           _ => Async::NotReady
-        };
-       // If the image has been loaded move to the loaded state
-       if let Async::Ready(asset) = result {
-           mole.image = ImageViewer::Loaded(asset);
-        }
+                // Check to see the progress of the loading image
+                let result = match mole.image {
+                    ImageViewer::Loading(ref mut loader) => loader.poll().unwrap(),
+                    _ => Async::NotReady
+                };
+                // If the image has been loaded move to the loaded state
+                if let Async::Ready(asset) = result {
+                    mole.image = ImageViewer::Loaded(asset);
+                }
             }
 
         }
 
-       // Check to see the progress of the loading font 
-       let result = match self.score_text_loader {
-           ScoreTextLoader::Loading(ref mut loader) => loader.poll().unwrap(),
-           ScoreTextLoader::Loaded => Async::NotReady
+        // Check to see the progress of the loading font
+        let result = match self.score_text_loader {
+            ScoreTextLoader::Loading(ref mut loader) => loader.poll().unwrap(),
+            ScoreTextLoader::Loaded => Async::NotReady
         };
 
-       if let Async::Ready(font) = result {
-           self.score_text_loader = ScoreTextLoader::Loaded;
-           self.score_text_font = Some(font);
+        if let Async::Ready(font) = result {
+            self.score_text_loader = ScoreTextLoader::Loaded;
+            self.score_text_font = Some(font);
         }
 
-       self.step += 1;
-       if (self.delay >= 1) {
-        self.delay -= 1
-       }
+        self.step += 1;
+        if (self.delay >= 1) {
+            self.delay -= 1
+        }
 
-       let num_active_moles = self
+        let num_active_moles = self
             .moles
             .iter()
             .filter(|m| m.is_some())
@@ -120,40 +120,40 @@ impl State for Whac {
         if num_active_moles < 1 {
             self.delay = 0;
             for (i, mole) in self.moles.iter_mut().enumerate() {
-                    if mole.is_none() {
-                        let (x, y) = match self.step % 5 {
-                            // 0 => {(200f32, 200f32)},
-                            // 1 => {(400f32, 200f32)},
-                            // 2 => {(600f32, 200f32)},
-                            // 3 => {(300f32, 400f32)},
-                            // 4 => {(500f32, 400f32)},
-                            _ => {(((random::<usize>() % 600) + 50) as f32, ((random::<usize>() % 500) + 50) as f32)}
-                        };
-                        *mole = Some(Mole::new(x, y, self.step + self.ttl));
-                        break;
-                    }
+                if mole.is_none() {
+                    let (x, y) = match self.step % 5 {
+                        // 0 => {(200f32, 200f32)},
+                        // 1 => {(400f32, 200f32)},
+                        // 2 => {(600f32, 200f32)},
+                        // 3 => {(300f32, 400f32)},
+                        // 4 => {(500f32, 400f32)},
+                        _ => {(((random::<usize>() % 600) + 50) as f32, ((random::<usize>() % 500) + 50) as f32)}
+                    };
+                    *mole = Some(Mole::new(x, y, self.step + self.ttl));
+                    break;
                 }
+            }
         }
-       
-       for mole in self.moles.iter_mut() {
+
+        for mole in self.moles.iter_mut() {
             let x = if let Some(m) = mole {m.ttl < self.step} else {false};
 
             if x {
                 mole.take();
             }
-           }
-   }
+        }
+    }
 
 
-   fn event(&mut self, event: &Event, window: &mut Window) {
-       use quicksilver::input::MouseButton::Left;
-       use quicksilver::input::ButtonState::Pressed;
-       if let Event::MouseButton(Left, Pressed) = event {
+    fn event(&mut self, event: &Event, window: &mut Window) {
+        use quicksilver::input::MouseButton::Left;
+        use quicksilver::input::ButtonState::Pressed;
+        if let Event::MouseButton(Left, Pressed) = event {
 
-           if let GameState::Lost(_) = self.state {
-               *self = Whac::new();
-               return;
-           }
+            if let GameState::Lost(_) = self.state {
+                *self = Whac::new();
+                return;
+            }
 
             let mouse = window.mouse().pos();
             let mut missed = true;
@@ -170,24 +170,24 @@ impl State for Whac {
                     missed = false;
                 }
             }
-            
-            if missed {
-                    self.miss += 1
-                }
-       }
-   }
 
-   fn draw(&mut self, window: &mut Window) {
-       if let GameState::Lost(score) = self.state {
-        if let Some(ref font) = self.score_text_font {
-            let score_text = font.render(&format!("Score: {}", score), 72.0, Color::red());
-            window.draw(&Draw::image(&score_text, Vector::new(350, 300)));
-            let score_text = font.render("Click to restart", 72.0, Color::red());
-            window.draw(&Draw::image(&score_text, Vector::new(350, 400)));
+            if missed {
+                self.miss += 1
+            }
         }
+    }
+
+    fn draw(&mut self, window: &mut Window) {
+        if let GameState::Lost(score) = self.state {
+            if let Some(ref font) = self.score_text_font {
+                let score_text = font.render(&format!("Score: {}", score), 72.0, Color::red());
+                window.draw(&Draw::image(&score_text, Vector::new(350, 300)));
+                let score_text = font.render("Click to restart", 72.0, Color::red());
+                window.draw(&Draw::image(&score_text, Vector::new(350, 400)));
+            }
             window.present();
-           return;
-       }
+            return;
+        }
 
         window.clear(Color::black());
 
@@ -207,7 +207,7 @@ impl State for Whac {
             window.draw(&Draw::image(&score_text, Vector::new(620, 100)));
         }
         window.present();
-   }
+    }
 }
 
 fn main() {
